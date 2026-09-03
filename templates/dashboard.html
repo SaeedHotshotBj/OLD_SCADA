@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+
+<html lang="fa" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>SCADA Dashboard</title>
+
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+
+
+<style>
+
+
+button{
+
+background:#0066cc;
+color:white;
+border:none;
+padding:8px 14px;
+border-radius:6px;
+cursor:pointer;
+font-size:14px;
+
+}
+
+button:hover{
+
+background:#004ea8;
+
+}
+
+
+
+body{
+
+    background:#f4f6f9;
+    font-family:Tahoma;
+}
+
+
+
+.dashboard,
+.cards{
+
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:20px;
+    margin:20px;
+
+}
+
+
+
+.card{
+
+    background:white;
+    width:220px;
+    padding:20px;
+    border-radius:12px;
+
+    box-shadow:
+    0 2px 10px rgba(0,0,0,.15);
+
+    text-align:center;
+
+}
+
+
+
+.value{
+
+    font-size:32px;
+    font-weight:bold;
+    margin:10px;
+
+}
+
+
+
+</style>
+
+
+</head>
+
+
+
+<body>
+
+
+
+{% include 'header.html' %}
+
+
+
+
+
+<div class="dashboard">
+
+
+
+<div class="card">
+
+<h3>
+شرکت
+</h3>
+
+<p>
+{{company_name}}
+</p>
+
+</div>
+
+
+
+
+
+<div class="card">
+
+<h3>
+PLC Status
+</h3>
+
+
+<p id="plc_status"
+style="color:green;font-weight:bold">
+
+🟢 Online
+
+</p>
+
+
+</div>
+
+
+
+
+
+<div class="card">
+
+<h3>
+PLC
+</h3>
+
+<p>
+{{plc_name}}
+</p>
+
+</div>
+
+
+
+
+
+<div class="card">
+
+<h3>
+IP
+</h3>
+
+<p>
+{{plc_ip}}
+</p>
+
+</div>
+
+
+
+
+
+<div class="card">
+
+<h3>
+Slave ID
+</h3>
+
+<p>
+{{slave_id}}
+</p>
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+<div class="cards">
+
+
+
+<div class="card">
+
+<h3>Voltage 1-2</h3>
+
+<div class="value" id="voltage_12">
+0
+</div>
+
+Volt
+
+<br><br>
+
+<a href="/trend?parameter=Voltage12">
+
+<button>
+📈 Graph
+</button>
+
+</a>
+
+</div>
+
+
+
+
+
+<div class="card">
+
+<h3>Voltage 1-3</h3>
+
+<div class="value" id="voltage_13">
+0
+</div>
+
+Volt
+
+<br><br>
+
+<a href="/trend?parameter=Voltage13">
+
+<button>
+📈 Graph
+</button>
+
+</a>
+
+</div>
+
+
+
+
+
+<div class="card">
+
+<h3>Voltage 2-3</h3>
+
+<div class="value" id="voltage_23">
+0
+</div>
+
+Volt
+
+<br><br>
+
+<a href="/trend?parameter=Voltage23">
+
+<button>
+📈 Graph
+</button>
+
+</a>
+
+</div>
+
+
+
+
+
+<div class="card">
+
+<h3>Voltage 1</h3>
+
+<div class="value" id="voltage_1">
+0
+</div>
+
+Volt
+
+<br><br>
+
+<a href="/trend?parameter=Voltage1">
+
+<button>
+📈 Graph
+</button>
+
+</a>
+
+</div>
+
+
+
+
+
+<div class="card">
+
+<h3>Voltage 2</h3>
+
+<div class="value" id="voltage_2">
+0
+</div>
+
+Volt
+
+<br><br>
+
+<a href="/trend?parameter=Voltage2">
+
+<button>
+📈 Graph
+</button>
+
+</a>
+
+</div>
+
+
+
+
+
+<div class="card">
+
+<h3>Voltage 3</h3>
+
+<div class="value" id="voltage_3">
+0
+</div>
+
+Volt
+
+<br><br>
+
+<a href="/trend?parameter=Voltage3">
+
+<button>
+📈 Graph
+</button>
+
+</a>
+
+</div>
+
+
+
+
+
+<div class="card">
+
+<h3>Current 1</h3>
+
+<div class="value" id="current_1">
+0
+</div>
+
+Amp
+
+<br><br>
+
+<a href="/trend?parameter=Current1">
+
+<button>
+📈 Graph
+</button>
+
+</a>
+
+</div>
+
+
+
+
+
+<div class="card">
+
+<h3>Current 2</h3>
+
+<div class="value" id="current_2">
+0
+</div>
+
+Amp
+
+<br><br>
+
+<a href="/trend?parameter=Current2">
+
+<button>
+📈 Graph
+</button>
+
+</a>
+
+</div>
+
+
+
+
+
+<div class="card">
+
+<h3>Current 3</h3>
+
+<div class="value" id="current_3">
+0
+</div>
+
+Amp
+
+<br><br>
+
+<a href="/trend?parameter=Current3">
+
+<button>
+📈 Graph
+</button>
+
+</a>
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<script>
+
+
+const socket = io();
+
+
+
+console.log("Dashboard started");
+
+
+
+
+
+socket.on(
+
+"dashboard_update",
+
+function(data){
+
+
+
+console.log(
+"PLC DATA",
+data
+);
+
+
+
+
+
+if(
+data.company_id != {{session.company_id}}
+)
+
+{
+
+return;
+
+}
+
+
+
+
+
+
+let values=data.values;
+
+
+
+
+
+let status =
+document.getElementById(
+"plc_status"
+);
+
+
+
+
+
+if(data.online)
+
+{
+
+status.innerHTML="🟢 Online";
+
+status.style.color="green";
+
+
+}
+
+else
+
+{
+
+status.innerHTML="🔴 Offline";
+
+status.style.color="red";
+
+
+}
+
+
+
+
+
+if(!values)
+
+return;
+
+
+
+
+
+
+
+// VOLTAGE VALUES
+
+
+document.getElementById(
+"voltage_12"
+).innerHTML=values[35];
+
+
+
+document.getElementById(
+"voltage_13"
+).innerHTML=values[36];
+
+
+
+document.getElementById(
+"voltage_23"
+).innerHTML=values[37];
+
+
+
+document.getElementById(
+"voltage_1"
+).innerHTML=values[38];
+
+
+
+document.getElementById(
+"voltage_2"
+).innerHTML=values[39];
+
+
+
+document.getElementById(
+"voltage_3"
+).innerHTML=values[40];
+
+
+
+
+
+
+
+// CURRENT VALUES
+
+
+document.getElementById(
+"current_1"
+).innerHTML=values[41];
+
+
+
+document.getElementById(
+"current_2"
+).innerHTML=values[42];
+
+
+
+document.getElementById(
+"current_3"
+).innerHTML=values[43];
+
+
+
+
+
+});
+
+
+
+
+
+
+
+socket.on(
+
+"connect",
+
+function(){
+
+console.log(
+"SOCKET CONNECTED"
+);
+
+}
+
+);
+
+
+
+</script>
+
+
+
+
+
+</body>
+
+</html>

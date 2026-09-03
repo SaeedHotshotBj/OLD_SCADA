@@ -1,0 +1,19 @@
+(*2*)
+(* Network 0 *)
+(*____________________ Auto Power Off ________________________________________ 116 ____________________*)
+LD    %SM0.0
+ANDN    %M0.2
+TON   T52, 20
+__CR_EQ_1
+MOVE    T52, %VW106
+__CR_RESTORE
+R_TRIG
+S    %M0.2
+(* Network 1 *)
+LD    %M0.2
+TON   T53, 20
+__CR_EQ_1
+MOVE    T53, %VW108
+__CR_RESTORE
+R_TRIG
+R    %M0.2

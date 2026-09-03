@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>PLC Control Panel</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
+
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+
+body{
+
+    margin:0;
+
+    background:#111827;
+
+    color:white;
+
+    font-family:Vazirmatn,Arial;
+
+}
+
+
+
+.container{
+
+    padding:30px;
+
+}
+
+
+
+.page-title{
+
+    font-size:30px;
+
+    color:#60a5fa;
+
+    font-weight:700;
+
+    margin-bottom:25px;
+
+}
+
+
+
+.card{
+
+    background:#1f2937;
+
+    border-radius:15px;
+
+    padding:25px;
+
+    margin-bottom:25px;
+
+    border:1px solid #374151;
+
+}
+
+
+
+.card h2{
+
+    color:#93c5fd;
+
+    margin-top:0;
+
+}
+
+
+
+.info{
+
+    font-size:18px;
+
+    line-height:2;
+
+}
+
+
+
+.lamp{
+
+    display:inline-block;
+
+    width:15px;
+
+    height:15px;
+
+    border-radius:50%;
+
+    background:#22c55e;
+
+}
+
+
+
+.register-value{
+
+    text-align:center;
+
+    font-size:50px;
+
+    font-weight:bold;
+
+    color:#facc15;
+
+}
+
+
+
+button{
+
+    border:none;
+
+    cursor:pointer;
+
+    border-radius:8px;
+
+    padding:12px 25px;
+
+    color:white;
+
+    font-size:16px;
+
+}
+
+
+
+button:hover{
+
+    opacity:.85;
+
+}
+
+
+
+.start{
+
+    background:#16a34a;
+
+}
+
+
+
+.stop{
+
+    background:#dc2626;
+
+}
+
+
+
+.write-btn{
+
+    background:#2563eb;
+
+}
+
+
+
+input,select{
+
+    padding:10px;
+
+    border-radius:8px;
+
+    border:1px solid #9ca3af;
+
+    color:black;
+
+    font-size:15px;
+
+}
+
+
+
+input{
+
+    margin:5px;
+
+}
+
+
+
+.user-management{
+
+    background:white;
+
+    color:black;
+
+}
+
+
+
+.user-management h2,
+.user-management h3{
+
+    color:#111827;
+
+}
+
+
+
+.create-box{
+
+    background:#f3f4f6;
+
+    padding:20px;
+
+    border-radius:12px;
+
+}
+
+
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    margin-top:20px;
+
+}
+
+
+
+th{
+
+    background:#e5e7eb;
+
+    padding:12px;
+
+}
+
+
+
+td{
+
+    padding:12px;
+
+    text-align:center;
+
+    border-bottom:1px solid #d1d5db;
+
+}
+
+
+
+.save-btn{
+
+    background:#2563eb;
+
+}
+
+
+
+.disable-btn{
+
+    background:#f59e0b;
+
+}
+
+
+
+.enable-btn{
+
+    background:#16a34a;
+
+}
+
+
+
+.delete-btn{
+
+    background:#dc2626;
+
+}
+
+
+
+.active{
+
+    color:green;
+
+    font-weight:bold;
+
+}
+
+
+
+.disabled{
+
+    color:red;
+
+    font-weight:bold;
+
+}
+
+
+
+/* PLC STATUS CARD BLACK TEXT */
+
+.status-card,
+.status-card h2,
+.status-card span,
+.status-card .info,
+.status-card .label{
+    color:black;
+}
+
+
+</style>
+
+
+</head>
+
+
+<body>
+
+
+{% include 'header.html' %}
+
+
+<div class="container">
+
+
+
+<div class="page-title">
+
+PLC CONTROL PANEL
+
+</div>
+
+
+
+
+
+<div class="card status-card">
+
+
+<h2>
+
+PLC STATUS
+
+</h2>
+
+
+<div class="info">
+
+
+<span class="lamp"></span>
+
+ONLINE
+
+
+<br><br>
+
+
+IP Address:
+
+{{ plc_ip }}
+
+
+<br>
+
+
+Slave ID:
+
+{{ slave }}
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="card">
+
+
+<h2>
+
+COMMAND REGISTER 117
+
+</h2>
+
+
+
+<div class="register-value">
+
+{{ current_value }}
+
+</div>
+
+
+
+<form method="POST" action="/control_write">
+
+
+<input type="hidden" name="register" value="117">
+
+<input type="hidden" name="value" value="0">
+
+
+<button class="start">
+
+START
+
+</button>
+
+
+</form>
+
+
+
+
+
+<form method="POST" action="/control_write">
+
+
+<input type="hidden" name="register" value="117">
+
+<input type="hidden" name="value" value="1">
+
+
+<button class="stop">
+
+STOP
+
+</button>
+
+
+</form>
+
+
+</div>
+
+
+
+
+
+<div class="card">
+
+
+<h2>
+
+MANUAL REGISTER WRITE
+
+</h2>
+
+
+
+<form method="POST" action="/control_write">
+
+
+<label>
+
+Register
+
+</label>
+
+
+<br>
+
+
+<input
+
+type="number"
+
+name="register"
+
+value="117"
+
+required
+
+>
+
+
+<br>
+
+
+<label>
+
+Value
+
+</label>
+
+
+<br>
+
+
+<input
+
+type="number"
+
+name="value"
+
+placeholder="0 - 65535"
+
+required
+
+>
+
+
+<br><br>
+
+
+<button class="write-btn">
+
+WRITE REGISTER
+
+</button>
+
+
+
+</form>
+
+
+</div>
+
+
+<!-- USER MANAGEMENT -->
+
+
+<div class="card user-management">
+
+
+<h2>
+
+USER MANAGEMENT
+
+</h2>
+
+
+
+
+<div class="create-box">
+
+
+<h3>
+
+CREATE NEW USER
+
+</h3>
+
+
+
+<form method="POST">
+
+
+
+<input type="hidden"
+name="action"
+value="create_user">
+
+
+
+<input type="text"
+name="username"
+placeholder="Username"
+required>
+
+
+
+<input type="password"
+name="password"
+placeholder="Password"
+required>
+
+
+
+<select name="role">
+
+
+<option value="admin">
+
+Admin
+
+</option>
+
+
+<option value="manager">
+
+Manager
+
+</option>
+
+
+<option value="operator">
+
+Operator
+
+</option>
+
+
+</select>
+
+
+
+<button class="start">
+
+Create User
+
+</button>
+
+
+
+</form>
+
+
+</div>
+
+
+
+
+
+<h3>
+
+USERS LIST
+
+</h3>
+
+
+
+<table>
+
+
+<tr>
+
+
+<th>
+
+Username
+
+</th>
+
+
+<th>
+
+Role
+
+</th>
+
+
+<th>
+
+Status
+
+</th>
+
+
+<th>
+
+Actions
+
+</th>
+
+
+</tr>
+
+
+
+
+
+{% for user in users %}
+
+
+
+<tr>
+
+
+
+<td>
+
+{{ user.Username }}
+
+</td>
+
+
+
+
+
+<td>
+
+
+
+<form method="POST">
+
+
+<input type="hidden"
+name="action"
+value="change_role">
+
+
+<input type="hidden"
+name="userid"
+value="{{ user.UserID }}">
+
+
+
+<select name="role">
+
+
+
+<option value="admin"
+{% if user.Role == "admin" %}
+selected
+{% endif %}
+>
+
+Admin
+
+</option>
+
+
+
+
+<option value="manager"
+{% if user.Role == "manager" %}
+selected
+{% endif %}
+>
+
+Manager
+
+</option>
+
+
+
+
+<option value="operator"
+{% if user.Role == "operator" %}
+selected
+{% endif %}
+>
+
+Operator
+
+</option>
+
+
+
+</select>
+
+
+
+
+<button class="save-btn">
+
+SAVE
+
+</button>
+
+
+</form>
+
+
+</td>
+
+
+
+
+
+
+<td>
+
+
+{% if user.Enabled %}
+
+
+<span class="active">
+
+Active
+
+</span>
+
+
+{% else %}
+
+
+<span class="disabled">
+
+Disabled
+
+</span>
+
+
+{% endif %}
+
+
+</td>
+
+
+
+
+
+
+
+<td>
+
+
+
+{% if user.Enabled %}
+
+
+
+<form method="POST">
+
+
+<input type="hidden"
+name="action"
+value="disable_user">
+
+
+<input type="hidden"
+name="userid"
+value="{{ user.UserID }}">
+
+
+
+<button class="disable-btn">
+
+Disable
+
+</button>
+
+
+</form>
+
+
+
+{% else %}
+
+
+
+<form method="POST">
+
+
+<input type="hidden"
+name="action"
+value="enable_user">
+
+
+<input type="hidden"
+name="userid"
+value="{{ user.UserID }}">
+
+
+
+<button class="enable-btn">
+
+Enable
+
+</button>
+
+
+</form>
+
+
+
+{% endif %}
+
+
+
+
+
+
+
+<form method="POST">
+
+
+<input type="hidden"
+name="action"
+value="delete_user">
+
+
+<input type="hidden"
+name="userid"
+value="{{ user.UserID }}">
+
+
+
+<button class="delete-btn"
+onclick="return confirm('Delete this user?')">
+
+
+Delete
+
+
+</button>
+
+
+</form>
+
+
+
+</td>
+
+
+
+</tr>
+
+
+
+{% endfor %}
+
+
+
+</table>
+
+
+</div>
+
+
+
+
+
+<div style="text-align:center;color:#9ca3af;margin-top:30px;">
+
+Industrial SCADA PLC Control
+
+</div>
+
+
+
+</div>
+
+
+
+</body>
+
+</html>

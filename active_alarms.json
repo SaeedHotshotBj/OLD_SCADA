@@ -1,0 +1,30 @@
+{
+    "2_Low Voltage L1": {
+        "text": "Low Voltage L1",
+        "level": "Critical"
+    },
+    "2_Low Voltage L2": {
+        "text": "Low Voltage L2",
+        "level": "Critical"
+    },
+    "2_Low Voltage L3": {
+        "text": "Low Voltage L3",
+        "level": "Critical"
+    },
+    "1_Low Voltage L1": {
+        "text": "Low Voltage L1",
+        "level": "Critical"
+    },
+    "1_Low Voltage L2": {
+        "text": "Low Voltage L2",
+        "level": "Critical"
+    },
+    "1_Low Voltage L3": {
+        "text": "Low Voltage L3",
+        "level": "Critical"
+    },
+    "1_Over Current L1": {
+        "text": "Over Current L1",
+        "level": "Critical"
+    }
+}
