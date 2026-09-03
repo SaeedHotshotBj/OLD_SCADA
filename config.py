@@ -1,4 +1,5 @@
-SQL_SERVER = "localhost"
-SQL_DATABASE = "SCADA_Server"
+import os
 
-SQL_DRIVER = "ODBC Driver 17 for SQL Server"
+# SQLite database used by the server.
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+SQLITE_DB = os.environ.get("SCADA_DB_PATH", os.path.join(BASE_DIR, "scada.db"))
