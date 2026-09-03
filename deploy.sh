@@ -6,7 +6,15 @@ cd "$APP_DIR"
 apt-get update
 apt-get install -y python3 python3-venv python3-pip git openssl
 
-python3 -m venv venv
+# Create the virtual environment only on the first deployment.
+# On later deployments the existing venv is reused.
+if [ ! -d "$APP_DIR/venv" ]; then
+    echo 'Creating Python virtual environment...'
+    python3 -m venv "$APP_DIR/venv"
+else
+    echo 'Existing Python virtual environment found. Reusing it.'
+fi
+
 venv/bin/pip install --upgrade pip
 venv/bin/pip install -r requirements.txt
 
