@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-APP_DIR="/var/www/scada"
+APP_DIR="/var/www/global"
 REPO="https://github.com/SaeedHotshotBj/OLD_SCADA.git"
 SERVICE="scada"
 EDGE_SERVICE="scada-edge-gateway"
