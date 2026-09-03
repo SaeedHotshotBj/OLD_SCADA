@@ -6,6 +6,9 @@ REPO="https://github.com/SaeedHotshotBj/OLD_SCADA.git"
 SERVICE="scada"
 PORT="5000"
 
+apt-get update -y
+apt-get install -y python3 python3-venv python3-pip git
+
 mkdir -p /var/www
 
 if [ ! -d "$APP_DIR/.git" ]; then
@@ -19,17 +22,11 @@ fi
 
 cd "$APP_DIR"
 
-if [ ! -f requirements.txt ]; then
-    echo "ERROR: requirements.txt not found in $APP_DIR"
-    exit 1
-fi
-
-apt-get update -y
-apt-get install -y python3 python3-venv python3-pip git
-
 python3 -m venv venv
 ./venv/bin/pip install --upgrade pip
-./venv/bin/pip install -r requirements.txt
+./venv/bin/pip install Flask Flask-SocketIO pandas openpyxl jdatetime pymodbus==2.5.3 simple-websocket
+
+./venv/bin/python -c "import database; print('SQLite database initialized:', database.SQLITE_DB)"
 
 cat > /etc/systemd/system/${SERVICE}.service <<EOF
 [Unit]
@@ -39,7 +36,8 @@ After=network.target
 [Service]
 User=root
 WorkingDirectory=${APP_DIR}
-Environment="PYTHONUNBUFFERED=1"
+Environment=PYTHONUNBUFFERED=1
+Environment=SCADA_DB_PATH=${APP_DIR}/scada.db
 ExecStart=${APP_DIR}/venv/bin/python app.py
 Restart=always
 RestartSec=5
@@ -57,5 +55,6 @@ systemctl --no-pager --full status "$SERVICE" || true
 
 echo ""
 echo "OLD SCADA deployed to $APP_DIR"
+echo "SQLite database: $APP_DIR/scada.db"
 echo "Service: $SERVICE"
 echo "Port: $PORT"
